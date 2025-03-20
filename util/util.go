@@ -149,19 +149,6 @@ func ConvertToBinaryString(data []byte) string {
 }
 
 func ConvertToByteArray(binaryString string) ([]byte, error){
-	remainder := len(binaryString)%8
-	suffix := ""
-	if remainder != 0 {
-		fmt.Printf("additional bits: %d\n",remainder)
-		for i := 0; i < 13 - remainder; i++ {
-			suffix+="0"
-		}
-		fmt.Printf("suffix: %s\n", suffix)
-		binaryCount := strconv.FormatInt(int64(remainder), 2)
-		paddedBinaryCount := fmt.Sprintf("%03s", binaryCount)
-		fmt.Printf("padded: %s\n", paddedBinaryCount)
-		binaryString+=suffix+paddedBinaryCount;
-	}
 	fmt.Println(binaryString)
 	byteArray := make([]byte, 0, len(binaryString)/8)
 

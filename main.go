@@ -109,7 +109,22 @@ func main() {
 	}
 	fmt.Println(output)
 
-	//convert binary string to byte array - last 3 bits encode significant bits in last 2 bytes
+	//last 3 bits encode significant bits in last 2 bytes
+	remainder := len(output)%8
+	padding := ""
+	if remainder != 0 {
+		fmt.Printf("additional bits: %d\n",remainder)
+		for i := 0; i < 13 - remainder; i++ {
+			padding+="0"
+		}
+		fmt.Printf("padding: %s\n", padding)
+		binaryCount := strconv.FormatInt(int64(remainder), 2)
+		significant_bits := fmt.Sprintf("%03s", binaryCount)
+		fmt.Printf("suffix: %s\n", significant_bits)
+		output+=padding+significant_bits;
+	}
+
+	//convert binary string to byte array
 	byteArray, err := util.ConvertToByteArray(output)
 	if err != nil {
 		fmt.Println("Error:", err)
