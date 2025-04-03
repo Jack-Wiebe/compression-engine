@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"compression-engine/util"
 	"container/heap"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -13,7 +12,8 @@ import (
 
 var code_map map[string]string
 
-func Encode_Huffman() {
+func Encode_Huffman(file *os.File) {
+
 	var input string
 	var output string
 	var bit_array []rune
@@ -21,17 +21,12 @@ func Encode_Huffman() {
 	freq_table := map[byte]int {}
 	code_map = make(map[string]string)
 	queue := make(util.PriorityQueue, 0)
-	//initialize flag arguments
-	filePath := flag.String("file", "test/default.txt", "input file")
-	flag.Parse()
-	fmt.Println(*filePath)
 
-	//open and read file
-	file, err := os.Open(*filePath)
+	_, err := file.Seek(0, 0)
 	if err != nil {
-		log.Fatalf("Failed to open file: %s", err)
+		fmt.Println("Error seeking:", err)
+		return
 	}
-	defer file.Close()
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanBytes)
 
