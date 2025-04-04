@@ -3,6 +3,10 @@ package util
 import (
 	"container/heap"
 	"fmt"
+	"image"
+	"image/color"
+	"image/png"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -164,3 +168,124 @@ func ConvertToByteArray(binaryString string) ([]byte, error){
 
 	return byteArray, nil
 }
+
+func SaveTestImg() {
+	// Create a 10x10 image
+
+	pixel_array := [][] int {
+		{1, 6, 4, 6, 2, 6, 4, 6, 1, 6, 4, 6}, // Row 0 (y=0)
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7}, // Row 1 (y=10)
+		{5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6}, // Row 2 (y=20)
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7}, // Row 3 (y=30)
+		{3, 6, 4, 6, 3, 6, 4, 6, 3, 6, 4, 6}, // Row 4 (y=40)
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7}, // Row 5 (y=50)
+		{5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6}, // Row 6 (y=60)
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7}, // Row 7 (y=70)
+		{1, 6, 4, 6, 2, 6, 4, 6, 1, 6, 4, 6}, // Row 8 (y=80)
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7}, // Row 9 (y=90)
+		{5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6}, // Row 10 (y=100)
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7},  // Row 11 (y=110)
+	};
+
+	color_array := []Color {
+		{r:  0, g:  0, b:   0, a:   0},
+		{r:170, g:170, b: 204, a: 255}, //rgb(170,170,204)
+		{r:255, g:  0, b:   0, a: 255},	//rgb(255,0,0)
+		{r:  0, g:128, b:   0, a: 255},	//rgb(0,128,0)
+		{r:  0, g:  0, b: 255, a: 255},	//rgb(0,0,255)
+		{r:170, g:153, b: 119, a: 255}, //rgb(170,153,119)
+		{r:119, g:170, b: 119, a: 255},	//rgb(119,170,119)
+		{r:255, g:255, b:   0, a: 255},	//rgb(255,255,0)
+	}
+
+	width, height := len(pixel_array[0]), len(pixel_array)
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
+
+	// Set all pixels to red
+	//red := color.RGBA{R: 255, G: 0, B: 0, A: 255}
+	for x := width-1; x >=0 ; x--{
+		for y := 0; y < height; y++ {
+			fmt.Println(x,y)
+			fmt.Println(pixel_array[x][y])
+			c := color_array[pixel_array[y][x]]
+			img.Set(x, y, color.RGBA{R: c.r, G: c.g, B: c.b, A: 255})
+		}
+	}
+
+	// Create the output file
+	file, err := os.Create("test_image.png")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	// Encode as PNG and save
+	err = png.Encode(file, img)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func LoadImage(path string) ([][]Color, error){
+	// Open image file
+	file, err := os.Open(path) // or "input.jpg"
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return nil,err
+	}
+	defer file.Close()
+
+	// Decode image
+	img, format, err := image.Decode(file)
+	if err != nil {
+		fmt.Println("Error decoding image:", err)
+		return  nil,err
+	}
+	fmt.Printf("Image format: %s\n", format)
+
+	// Get image bounds
+	bounds := img.Bounds()
+	width, height := bounds.Max.X, bounds.Max.Y
+	fmt.Printf("Image dimensions: %dx%d\n", width, height)
+
+	//make empty 2D array for image
+	image := make([][]Color, width)
+	for i := range image {
+		image[i] =  make([]Color, height)
+	}
+
+	// Read pixels
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			// Get RGBA values (each range 0-65535)
+			r, g, b, a := img.At(x, y).RGBA()
+
+			// Convert to 8-bit values (0-255)
+			var color Color
+			color.r = uint8(r >> 8)
+			color.g = uint8(g >> 8)
+			color.b = uint8(b >> 8)
+			color.a = uint8(a >> 8)
+			image[x][y] = color
+
+
+			fmt.Printf("Pixel at (%d,%d): R=%d, G=%d, B=%d, A=%d\n",
+				x, y, color.r, color.g, color.b, color.a)
+		}
+	}
+
+	return image, nil;
+}
+
+type Pixel struct {
+	X int
+	Y int
+}
+
+type Color struct {
+	r uint8
+	g uint8
+	b uint8
+	a uint8
+}
+

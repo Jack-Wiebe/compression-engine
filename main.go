@@ -2,6 +2,7 @@ package main
 
 import (
 	"compression-engine/huffman"
+	"compression-engine/pass_extraction"
 	"compression-engine/runlength"
 	"flag"
 	"fmt"
@@ -12,6 +13,14 @@ import (
 //test.txt -> 2536 -> 1204
 
 func main(){
+
+	Runlength_Huffman_Test()
+
+	pass_extraction.Test()
+
+}
+
+func Runlength_Huffman_Test() {
 
 	filePath := flag.String("file", "test/default.txt", "input file")
 	flag.Parse()
@@ -30,5 +39,5 @@ func main(){
 	runlength.Encode_Runlength(file)
 	runlength.Decode_Runlength()
 
-
 }
+
