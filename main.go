@@ -38,7 +38,6 @@ func Encoding_Test() {
 	runlength.Encode_Runlength(file)
 	runlength.Decode_Runlength()
 
-
   lz.Encode_LZSS(file)
 	//lz.Encode_LZ77(file)
 

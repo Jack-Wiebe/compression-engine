@@ -3,6 +3,7 @@ package lz
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -106,16 +107,18 @@ func Encode_LZSS(file *os.File) {
 	//SET UP CONSTANTS AND VARIABLES
 	input := []rune(s)
 	output := ""
-	SMALLEST_MATCH := 7
+
 	FRONT_BUFFER_SIZE := 1024
 	BACK_BUFFER_SIZE := 1024
-
 	if len(input) < FRONT_BUFFER_SIZE {
 		FRONT_BUFFER_SIZE = len(input)
 	}
 	if len(input) < BACK_BUFFER_SIZE {
 		BACK_BUFFER_SIZE = len(input)
 	}
+
+	//Smallest match size is calculated by the number of digest in the front buffer
+	SMALLEST_MATCH := int(math.Log10(float64(BACK_BUFFER_SIZE))) + 4
 
 	//instantiate buffer
 	buffer := make([]rune, BACK_BUFFER_SIZE+FRONT_BUFFER_SIZE)
