@@ -95,5 +95,6 @@ func Decode_Runlength(){
 	}
 
 	fmt.Println(output)
+	fmt.Println()
 
 }
